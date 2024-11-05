@@ -4,16 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Insane News</title>
-    <link rel="stylesheet" href="css/posts.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/posts.css">
 </head>
 <body>
     <div class="header">
         <i class="fa-regular fa-newspaper icon"></i>
-        <i class="fa-solid fa-circle-plus icon"></i>    
+        <div class="searchContainer">
+            <i class="fa-solid fa-magnifying-glass searchIcon"></i>
+            <input type="text" id="searchKeywords" placeholder="Recherche..." class="searchInput">
+            <i class="fa-solid fa-circle-right sendIcon"></i>
+        </div>
+        <div class="dropdown categorySelection">
+            <div data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-ellipsis-vertical categoriesIcon"></i>
+            </div>
+            <div class="dropdown-menu noselect" id="DDMenu">
+                <div class="dropdown-item" id="aboutCmd">
+                    <i class="fa fa-info-circle mx-2"></i> À propos...
+                </div>
+            </div>
+        </div>
+        <i class="fa-solid fa-circle-plus addIcon"></i>    
     </div>
-    <div class="content">
+    <div class="content test">
         <!-- Show the actual content of the page -->
+
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.maskedinput/1.4.1/jquery.maskedinput.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 </body>
 </html>
