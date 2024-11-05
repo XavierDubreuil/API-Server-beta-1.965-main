@@ -1,4 +1,6 @@
-export default class Posts extends Model {
+import Model from './model.js';
+
+export default class Post extends Model {
     constructor() {
         super(true);
         //true dans le constructeur permet de créer un Id sécurisé
@@ -8,6 +10,6 @@ export default class Posts extends Model {
         this.addField('Category', 'string');
         this.addField('Image', 'asset');
         this.addField('Creation', 'integer');
-        this.setKey("Id");
+        this.setKey("Title");
     }
 }
