@@ -1,3 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap');
+:root{
+    --greenText: #084711;
+    --notoFont: "Noto Serif", serif;
+}
+
 body{
     margin: 0;
 }
@@ -56,12 +62,49 @@ body{
 }
 /*Content related*/
 .content{
-   height: 1000px; 
    margin: 1.5%;
    padding: 1.5%;
 }
+.newsContainer{
+    margin-bottom: 2%;
+}
+/*News Header*/
+.newsHeader{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.newsCategory{
+    font-family: var(--notoFont);
+    font-weight: bold;
+    font-size: 1.4em;
+    color: var(--greenText);
+    text-decoration: underline solid var(--greenText) 50%;
+}
+.actionIcon{
+    font-size: 1.8em;
+    color: var(--greenText);
+}
+/*NewsContent*/
+.newsTitle{
+    font-family: var(--notoFont);
+    font-weight: bold;
+    font-size: 2.4em;
+    max-width: 90%;
+}
+.newsImage{
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 800px;
+    width: 90%;
+}
+.newsDescription{
+    margin-top: 10px;
+    font-family: var(--notoFont);
+    font-weight: 600;
+}
 .test{
     border: dotted red 1px;
-    background-color: #52c43c;
-    opacity: 0.7;
+    /* background-color: #52c43c;
+    opacity: 0.7; */
 }
