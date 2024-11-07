@@ -84,6 +84,7 @@ body{
 .actionIcon{
     font-size: 1.8em;
     color: var(--greenText);
+    margin-left: 10px;
 }
 /*NewsContent*/
 .newsTitle{
@@ -102,6 +103,7 @@ body{
     margin-top: 10px;
     font-family: var(--notoFont);
     font-weight: 600;
+    text-align: justify;
 }
 .test{
     border: dotted red 1px;

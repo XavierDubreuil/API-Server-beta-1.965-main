@@ -28,6 +28,22 @@ function showWaitingGif() {
 function formatDate(){
 
 }
+function convertToFrenchDate(numeric_date) {
+    date = new Date(numeric_date);
+    var options = { year: 'numeric', month: 'long', day: 'numeric' };
+    var opt_weekday = { weekday: 'long' };
+    var weekday = toTitleCase(date.toLocaleDateString("fr-FR", opt_weekday));
+
+    function toTitleCase(str) {
+        return str.replace(
+            /\w\S*/g,
+            function (txt) {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            }
+        );
+    }
+    return weekday + " le " + date.toLocaleDateString("fr-FR", options) + " @ " + date.toLocaleTimeString("fr-FR");
+}
 //Render Function (GET)
 async function renderPosts(){
     showWaitingGif();
@@ -45,6 +61,7 @@ async function renderPosts(){
 }
 function renderPost(post){
     return $(`	
+        <hr />
         <div class="newsContainer">
             <div class="newsHeader">
                 <span class="newsCategory">${post.Category}</span>
@@ -55,7 +72,7 @@ function renderPost(post){
             </div>
             <p class="newsTitle">${post.Title}</p>
             <div class="newsImage" style='background-image: url("${post.Image}")'></div>
-            <span>${post.Creation}</span>
+            <span>${convertToFrenchDate(post.Creation)}</span>
             <p class="newsDescription">${post.Text}</p>
         </div>
     `);
