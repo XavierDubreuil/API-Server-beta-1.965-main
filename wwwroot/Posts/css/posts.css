@@ -90,13 +90,13 @@ body{
     font-family: var(--notoFont);
     font-weight: bold;
     font-size: 2.4em;
-    max-width: 90%;
+    max-width: 95%;
 }
 .newsImage{
     background-repeat: no-repeat;
     background-size: cover;
     height: 800px;
-    width: 90%;
+    width: 95%;
 }
 .newsDescription{
     margin-top: 10px;

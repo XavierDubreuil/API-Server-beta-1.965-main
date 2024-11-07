@@ -44,13 +44,13 @@ async function renderPosts(){
     }
 }
 function renderPost(post){
-    return $(`
+    return $(`	
         <div class="newsContainer">
             <div class="newsHeader">
                 <span class="newsCategory">${post.Category}</span>
                 <div>
-                    <i class="fa-solid fa-circle-plus actionIcon"></i>    
-                    <i class="fa-solid fa-circle-plus actionIcon"></i>    
+                    <i class="fa-solid fa-pen-to-square actionIcon"></i>
+                    <i class="fa-solid fa-trash actionIcon"></i>
                 </div>
             </div>
             <p class="newsTitle">${post.Title}</p>
