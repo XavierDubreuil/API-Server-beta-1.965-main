@@ -1,16 +1,30 @@
 Init_UI();
+$("#aboutCmd").click(function (elem) {
+    console.log("asfsgdhj");
+    categoryAlreadyGet = true;
+    renderPosts(elem.name);
+})
+let categoryAlreadyGet = false;
 //Les catégories
-function Tamere(posts)
+function GetCategories(posts)
 {
     var selectedCategory = $(".dropdown-menu")
-    var selectedCategorys = [];
+    var selectedCategories = [];
     if(posts != null)
     {
         posts.forEach(post => {
-            if(!selectedCategorys.includes(post))
-                selectedCategory.append($(`<div class='dropdown-item' id='aboutCmd'> <i class='fa fa-info-circle mx-2'></i> ${post.Category} </div>`));
+            if(!selectedCategories.includes(post))
+                selectedCategory.append($(`<div class='dropdown-item' id='aboutCmd' name='${post.Category}'> <i class='fa fa-info-circle mx-2'></i> ${post.Category} </div>`));
         })
     }
+    //console.log(selectedCategory.value);
+    /*
+    selectedCategory.on("click", function() {
+        console.log(selectedCategory.text);
+        categoryAlreadyGet = true;
+        renderPosts(selectedCategory.value);
+    });
+    */
 }
 
 //Start Funtion
@@ -45,16 +59,29 @@ function convertToFrenchDate(numeric_date) {
     return weekday + " le " + date.toLocaleDateString("fr-FR", options) + " @ " + date.toLocaleTimeString("fr-FR");
 }
 //Render Function (GET)
-async function renderPosts(){
+async function renderPosts(selectedCategory = null){
     showWaitingGif();
     let posts = await API_GetPosts();
-    Tamere(posts);
+    if(!categoryAlreadyGet)
+        GetCategories(posts);
     console.log(posts);
     eraseContent();
     if (posts !== null) {
-        posts.forEach(post => {
-            $(".content").append(renderPost(post));
-        });
+        if(selectedCategory != null)
+        {
+            posts.forEach(post => {
+                if(selectedCategory == post.Category)
+                {
+                    $(".content").append(renderPost(post));
+                }
+            });
+        }
+        else
+        {
+            posts.forEach(post => {
+                $(".content").append(renderPost(post));
+            });
+        }
     } else {
         renderError("Service introuvable");
     }
