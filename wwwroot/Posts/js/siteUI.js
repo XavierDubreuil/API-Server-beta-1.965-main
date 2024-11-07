@@ -1,4 +1,18 @@
 Init_UI();
+//Les catégories
+function Tamere(posts)
+{
+    var selectedCategory = $(".dropdown-menu")
+    var selectedCategorys = [];
+    if(posts != null)
+    {
+        posts.forEach(post => {
+            if(!selectedCategorys.includes(post))
+                selectedCategory.append($(`<div class='dropdown-item' id='aboutCmd'> <i class='fa fa-info-circle mx-2'></i> ${post.Category} </div>`));
+        })
+    }
+}
+
 //Start Funtion
 function Init_UI() {
     renderPosts();
@@ -18,6 +32,7 @@ function formatDate(){
 async function renderPosts(){
     showWaitingGif();
     let posts = await API_GetPosts();
+    Tamere(posts);
     console.log(posts);
     eraseContent();
     if (posts !== null) {

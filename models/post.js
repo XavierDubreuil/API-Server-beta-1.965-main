@@ -12,4 +12,10 @@ export default class Post extends Model {
         this.addField('Creation', 'integer');
         this.setKey("Title");
     }
+    bindExtraData(instance) {
+        instance = super.bindExtraData(instance);
+        this.addField('Creation', 'integer');
+        instance.Creation = Date.now();
+        return instance;
+    }
 }
