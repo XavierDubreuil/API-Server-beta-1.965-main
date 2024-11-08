@@ -11,7 +11,18 @@ function API_GetPosts() {
             success: posts => { currentHttpError = ""; resolve(posts); },
             error: (xhr) => { console.log(xhr); resolve(null); }
         });
-    });
+    }
+);
+}
+function API_GetPostsKeywords(words) {
+    return new Promise(resolve => {
+        $.ajax({
+            url: API_URL + "/?keywords=" + words,
+            success: posts => { currentHttpError = ""; resolve(posts); },
+            error: (xhr) => { console.log(xhr); resolve(null); }
+        });
+    }
+);
 }
 function API_GetPost(postId) {
     return new Promise(resolve => {

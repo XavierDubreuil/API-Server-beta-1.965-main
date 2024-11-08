@@ -1,9 +1,18 @@
-Init_UI();
-$("#aboutCmd").click(function (elem) {
-    console.log("asfsgdhj");
+$(".dropdown-menu").on("click", ".dropdown-item", function () {
+    console.log($(this).data("name"));
     categoryAlreadyGet = true;
-    renderPosts(elem.name);
+    renderPosts($(this).data("name"));
+});
+$("#AllCmd").click(function () {
+    renderPosts();
 })
+$(".sendIcon").click(function(){
+    let words = $("#searchKeywords").val().trim();
+    if(words!=undefined&&words!=null&&words!="")
+    {
+        renderPosts(null,words);
+    }
+});
 let categoryAlreadyGet = false;
 //Les catégories
 function GetCategories(posts)
@@ -13,8 +22,10 @@ function GetCategories(posts)
     if(posts != null)
     {
         posts.forEach(post => {
-            if(!selectedCategories.includes(post))
-                selectedCategory.append($(`<div class='dropdown-item' id='aboutCmd' name='${post.Category}'> <i class='fa fa-info-circle mx-2'></i> ${post.Category} </div>`));
+            if (!selectedCategories.includes(post.Category)) {
+                selectedCategories.push(post.Category); // Ajouter la catégorie à la liste des catégories
+                selectedCategory.append($(`<div class='dropdown-item' data-name='${post.Category}'> <i class='fa fa-info-circle mx-2'></i> ${post.Category} </div>`));
+            }
         })
     }
     //console.log(selectedCategory.value);
@@ -28,8 +39,8 @@ function GetCategories(posts)
 }
 
 //Start Funtion
-function Init_UI() {
-    renderPosts();
+async function Init_UI() {
+    await renderPosts();
 }
 //Utilities Functions
 function eraseContent() {
@@ -59,9 +70,23 @@ function convertToFrenchDate(numeric_date) {
     return weekday + " le " + date.toLocaleDateString("fr-FR", options) + " @ " + date.toLocaleTimeString("fr-FR");
 }
 //Render Function (GET)
-async function renderPosts(selectedCategory = null){
+async function renderPosts(selectedCategory = null, keywords = null){
+    console.log(keywords);
     showWaitingGif();
-    let posts = await API_GetPosts();
+    let posts;
+    if(keywords!= null)
+    {
+        console.log(keywords);
+        keywords = keywords.replace(/ /g, ",");
+        console.log(keywords);
+        posts = await API_GetPostsKeywords(keywords);
+        console.log(posts);
+    }
+    else{
+        console.log("nooooo");
+        posts = await API_GetPosts();
+    }
+    
     if(!categoryAlreadyGet)
         GetCategories(posts);
     console.log(posts);
@@ -79,6 +104,7 @@ async function renderPosts(selectedCategory = null){
         else
         {
             posts.forEach(post => {
+                console.log(post);
                 $(".content").append(renderPost(post));
             });
         }
@@ -104,3 +130,4 @@ function renderPost(post){
         </div>
     `);
 }
+Init_UI();
