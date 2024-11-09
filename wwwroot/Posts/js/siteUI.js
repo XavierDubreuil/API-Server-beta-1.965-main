@@ -6,21 +6,18 @@ $(".dropdown-menu").on("click", ".dropdown-item", function () {
 $("#AllCmd").click(function () {
     renderPosts();
 })
-$(".sendIcon").click(function(){
+$(".sendIcon").click(function () {
     let words = $("#searchKeywords").val().trim();
-    if(words!=undefined&&words!=null&&words!="")
-    {
-        renderPosts(null,words);
+    if (words != undefined && words != null && words != "") {
+        renderPosts(null, words);
     }
 });
 let categoryAlreadyGet = false;
 //Les catégories
-function GetCategories(posts)
-{
+function GetCategories(posts) {
     var selectedCategory = $(".dropdown-menu")
     var selectedCategories = [];
-    if(posts != null)
-    {
+    if (posts != null) {
         posts.forEach(post => {
             if (!selectedCategories.includes(post.Category)) {
                 selectedCategories.push(post.Category); // Ajouter la catégorie à la liste des catégories
@@ -50,8 +47,15 @@ function showWaitingGif() {
     eraseContent();
     $("#content").append($("<div class='waitingGifcontainer'><img class='waitingGif' src='Loading_icon.gif' /></div>'"));
 }
-function formatDate(){
-
+function renderError(message) {
+    eraseContent();
+    $("#content").append(
+        $(`
+            <div class="errorContainer">
+                ${message}
+            </div>
+        `)
+    );
 }
 function convertToFrenchDate(numeric_date) {
     date = new Date(numeric_date);
@@ -70,57 +74,64 @@ function convertToFrenchDate(numeric_date) {
     return weekday + " le " + date.toLocaleDateString("fr-FR", options) + " @ " + date.toLocaleTimeString("fr-FR");
 }
 //Render Function (GET)
-async function renderPosts(selectedCategory = null, keywords = null){
+async function renderPosts(selectedCategory = null, keywords = null) {
+    //keywords
     console.log(keywords);
     showWaitingGif();
     let posts;
-    if(keywords!= null)
-    {
+    if (keywords != null) {
         console.log(keywords);
         keywords = keywords.replace(/ /g, ",");
         console.log(keywords);
         posts = await API_GetPostsKeywords(keywords);
         console.log(posts);
     }
-    else{
+    else {
         console.log("nooooo");
         posts = await API_GetPosts();
     }
-    
-    if(!categoryAlreadyGet)
-        GetCategories(posts);
-    console.log(posts);
-    eraseContent();
+
     if (posts !== null) {
-        if(selectedCategory != null)
-        {
+        if (!categoryAlreadyGet)
+            GetCategories(posts);
+        console.log(posts);
+        eraseContent();
+        //posts
+        if (selectedCategory != null) {
             posts.forEach(post => {
-                if(selectedCategory == post.Category)
-                {
+                if (selectedCategory == post.Category) {
                     $(".content").append(renderPost(post));
                 }
             });
+            $('.deleteCmd').on('click', function(e) {
+                console.log("click");
+                let id = $(this).attr("postId");
+                deletePostForm(id)
+            });
         }
-        else
-        {
+        else {
             posts.forEach(post => {
-                console.log(post);
                 $(".content").append(renderPost(post));
+            });
+            $('.deleteCmd').on('click', function(e) {
+                console.log("click");
+                let id = $(this).attr("postId");
+                deletePostForm(id);
             });
         }
     } else {
         renderError("Service introuvable");
     }
 }
-function renderPost(post){
+function renderPost(post) {
     return $(`	
-        <hr />
         <div class="newsContainer">
+            <hr />
             <div class="newsHeader">
                 <span class="newsCategory">${post.Category}</span>
                 <div>
                     <i class="fa-solid fa-pen-to-square actionIcon"></i>
-                    <i class="fa-solid fa-trash actionIcon"></i>
+                    <i class="fa-solid fa-trash actionIcon deleteCmd" postId="${post.Id}"></i>
                 </div>
             </div>
             <p class="newsTitle">${post.Title}</p>
@@ -130,4 +141,13 @@ function renderPost(post){
         </div>
     `);
 }
+//Delete
+async function deletePostForm(id) {
+    //Get the post
+    let toDeletePost = await API_GetPost(id);
+    eraseContent();
+    $(".content").append(renderPost(toDeletePost));
+
+}
+
 Init_UI();
