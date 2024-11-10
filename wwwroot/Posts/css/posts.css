@@ -65,7 +65,7 @@ body{
    margin: 1.5%;
    padding: 1.5%;
 }
-.newsContainer{
+.newsContainer, .deleteNewsContainer{
     margin-bottom: 2%;
 }
 /*News Header*/
@@ -74,7 +74,7 @@ body{
     justify-content: space-between;
     margin-bottom: 10px;
 }
-.newsCategory{
+.newsCategory, .deleteNewsCategory{
     font-family: var(--notoFont);
     font-weight: bold;
     font-size: 1.4em;
@@ -87,13 +87,13 @@ body{
     margin-left: 10px;
 }
 /*NewsContent*/
-.newsTitle{
+.newsTitle, .deleteNewsTitle{
     font-family: var(--notoFont);
     font-weight: bold;
     font-size: 2.4em;
     max-width: 95%;
 }
-.newsImage{
+.newsImage, .deleteImage{
     background-repeat: no-repeat;
     background-size: cover;
     height: 800px;
@@ -104,6 +104,54 @@ body{
     font-family: var(--notoFont);
     font-weight: 600;
     text-align: justify;
+}
+/*Forms Related*/
+.forms{
+    margin: 2%;
+}
+.formTitle{
+    font-size: 2.2em;
+    font-weight: bold;
+    font-family: var(--notoFont);
+}
+/*Delete Form Related*/
+.deleteImage{
+    height: 450px;
+}
+.deleteNewsContainer{
+    width: 50%;
+    margin-top: 20px;
+    border: solid black 0.5px;
+    padding: 1%;
+    margin-bottom: 10px;
+}
+.deleteNewsCategory{
+    font-size: 1.1em;
+}
+.deleteNewsTitle{
+    font-size: 1.7em;
+}
+.confirmButtonsContainer{
+    display: flex;
+    width: 250px;
+    justify-content: space-between;
+    padding: 10px;
+}
+.confirmButton{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    width: 100px;
+    background-color: lightgray;
+    border-radius: 5px;
+    color: white;
+}
+#yesOption{
+    background-color: var(--greenText);
+}
+#noOption{
+    background-color: crimson;
 }
 .test{
     border: dotted red 1px;

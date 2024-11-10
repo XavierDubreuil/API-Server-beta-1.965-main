@@ -103,7 +103,7 @@ async function renderPosts(selectedCategory = null, keywords = null) {
                     $(".content").append(renderPost(post));
                 }
             });
-            $('.deleteCmd').on('click', function(e) {
+            $('.deleteCmd').on('click', function (e) {
                 console.log("click");
                 let id = $(this).attr("postId");
                 deletePostForm(id)
@@ -113,7 +113,7 @@ async function renderPosts(selectedCategory = null, keywords = null) {
             posts.forEach(post => {
                 $(".content").append(renderPost(post));
             });
-            $('.deleteCmd').on('click', function(e) {
+            $('.deleteCmd').on('click', function (e) {
                 console.log("click");
                 let id = $(this).attr("postId");
                 deletePostForm(id);
@@ -145,9 +145,42 @@ function renderPost(post) {
 async function deletePostForm(id) {
     //Get the post
     let toDeletePost = await API_GetPost(id);
-    eraseContent();
-    $(".content").append(renderPost(toDeletePost));
+    //Hide the posts
+    $('.content').hide();
+    //Show the form
+    $(".deleteForm").append(renderDelete(toDeletePost));
+    //Listener On The Buttons
+    $('.confirmButtonsContainer > div').on("click", async function () {
+        console.log($(this).attr('id'));
+        if ($(this).attr('id') == 'yesOption') {
+            await API_DeletePost(id);
+            $(".deleteForm").empty();
+            $('.content').show();
+            renderPosts();
+        }
+        else {
+            $(".deleteForm").empty();
+            $('.content').show();
+        }
+    });
 
 }
-
+function renderDelete(toDeletePost) {
+    return $(`
+        <span class="formTitle">Voulez-vous vraiment supprimer ce Post ? :</span>
+        <div class="deleteNewsContainer">
+            <div class="newsHeader">
+                <span class="deleteNewsCategory">${toDeletePost.Category}</span>
+            </div>
+            <p class="deleteNewsTitle">${toDeletePost.Title}</p>
+            <div class="deleteImage" style='background-image: url("${toDeletePost.Image}")'></div>
+            <span>${convertToFrenchDate(toDeletePost.Creation)}</span>
+            <p class="newsDescription">${toDeletePost.Text}</p>
+        </div>
+        <div class="confirmButtonsContainer">
+            <div class="confirmButton" id="noOption">Non</div>
+            <div class="confirmButton" id="yesOption">Oui</div>
+        </div>
+    `);
+}
 Init_UI();
