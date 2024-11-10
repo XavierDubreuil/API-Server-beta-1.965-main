@@ -51,7 +51,7 @@ function API_DeletePost(id) {
             url: API_URL + "/" + id,
             type: "DELETE",
             success: () => { currentHttpError = ""; resolve(true); },
-            error: (xhr) => { currentHttpError = xhr.responseJSON.error_description; resolve(false /*xhr.status*/); }
+            error: (xhr) => { resolve(false /*xhr.status*/); }
         });
     });
 }

@@ -154,6 +154,8 @@ async function deletePostForm(id) {
         console.log($(this).attr('id'));
         if ($(this).attr('id') == 'yesOption') {
             await API_DeletePost(id);
+            if(API_DeletePost.error)
+                console.log("erreur");
             $(".deleteForm").empty();
             $('.content').show();
             renderPosts();
