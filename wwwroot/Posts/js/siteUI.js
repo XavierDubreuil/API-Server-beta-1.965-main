@@ -37,6 +37,7 @@ function GetCategories(posts) {
 
 //Start Funtion
 async function Init_UI() {
+    $(".forms").hide();
     await renderPosts();
 }
 //Utilities Functions
@@ -145,6 +146,8 @@ function renderPost(post) {
 async function deletePostForm(id) {
     //Get the post
     let toDeletePost = await API_GetPost(id);
+    //Show forms
+    $(".forms").show();
     //Hide the posts
     $('.content').hide();
     //Show the form
@@ -154,7 +157,7 @@ async function deletePostForm(id) {
         console.log($(this).attr('id'));
         if ($(this).attr('id') == 'yesOption') {
             await API_DeletePost(id);
-            if(API_DeletePost.error)
+            if (API_DeletePost.error)
                 console.log("erreur");
             $(".deleteForm").empty();
             $('.content').show();
@@ -163,6 +166,7 @@ async function deletePostForm(id) {
         else {
             $(".deleteForm").empty();
             $('.content').show();
+            $(".forms").hide();
         }
     });
 
