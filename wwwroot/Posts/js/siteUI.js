@@ -1,3 +1,8 @@
+const periodicRefreshPeriod = 10;
+let categoryAlreadyGet = false;
+let hold_Periodic_Refresh = false;
+let pageManager;
+let currentETag = "";
 $(".dropdown-menu").on("click", ".dropdown-item", function () {
     console.log($(this).data("name"));
     categoryAlreadyGet = true;
@@ -12,7 +17,6 @@ $(".sendIcon").click(function () {
         renderPosts(null, words);
     }
 });
-let categoryAlreadyGet = false;
 //Les catégories
 function GetCategories(posts) {
     var selectedCategory = $(".dropdown-menu")
@@ -37,8 +41,10 @@ function GetCategories(posts) {
 
 //Start Funtion
 async function Init_UI() {
+    //pageManager = new PageManager('scrollPanel', 'itemsPanel', itemLayout, renderBookmarks);
     $(".forms").hide();
     await renderPosts();
+    start_Periodic_Refresh();
 }
 //Utilities Functions
 function eraseContent() {
@@ -95,6 +101,7 @@ async function renderPosts(selectedCategory = null, keywords = null) {
     if (posts !== null) {
         if (!categoryAlreadyGet)
             GetCategories(posts);
+        currentETag = posts.etag;
         console.log(posts);
         eraseContent();
         //posts
@@ -188,5 +195,17 @@ function renderDelete(toDeletePost) {
             <div class="confirmButton" id="yesOption">Oui</div>
         </div>
     `);
+}
+function start_Periodic_Refresh() {
+    setInterval(async () => {
+        if (!hold_Periodic_Refresh) {
+            let etag = await API_HeadPosts();
+            if (currentETag != etag) {
+                currentETag = etag;
+                renderPosts();
+            }
+        }
+    },
+        periodicRefreshPeriod * 1000);
 }
 Init_UI();

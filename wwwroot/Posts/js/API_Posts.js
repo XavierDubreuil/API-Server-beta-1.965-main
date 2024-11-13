@@ -1,18 +1,30 @@
 const API_URL = "http://localhost:5000/api/posts";
 let currentHttpError = "";
-
+let currentStatus = 0;
+let error = false;
 function API_getcurrentHttpError () {
     return currentHttpError; 
 }
 function API_GetPosts() {
     return new Promise(resolve => {
         $.ajax({
-            url: API_URL,
+            url: API_URL + "/?sort=Creation,desc",
             success: posts => { currentHttpError = ""; resolve(posts); },
             error: (xhr) => { console.log(xhr); resolve(null); }
         });
     }
 );
+}
+function API_HeadPosts(){
+    return new Promise(resolve => {
+        $.ajax({
+            url: API_URL,
+            type: 'HEAD',
+            contentType: 'text/plain',
+            complete: data => { resolve(data.getResponseHeader('ETag')); },
+            error: (xhr) => { Bookmarks_API.setHttpErrorState(xhr); resolve(null); }
+        });
+    });
 }
 function API_GetPostsKeywords(words) {
     return new Promise(resolve => {
