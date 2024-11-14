@@ -2,24 +2,31 @@ const periodicRefreshPeriod = 10;
 let categoryAlreadyGet = false;
 let hold_Periodic_Refresh = false;
 let pageManager;
+let selectedCategorie = "";
 let currentETag = "";
+let words = "";
 $(".dropdown-menu").on("click", ".dropdown-item", function () {
-    console.log($(this).data("name"));
+    //console.log($(this).data("name"));
     categoryAlreadyGet = true;
-    renderPosts($(this).data("name"));
+    selectedCategorie = $(this).data("name");
+    //renderPosts($(this).data("name"));
+    pageManager.reset();
 });
 $("#AllCmd").click(function () {
-    renderPosts();
+    selectedCategorie = "";
+    pageManager.reset();
 })
 $(".sendIcon").click(function () {
-    let words = $("#searchKeywords").val().trim();
+    words = $("#searchKeywords").val().trim();
     if (words != undefined && words != null && words != "") {
-        renderPosts(null, words);
+        pageManager.reset();
     }
 });
 //Les catégories
 function GetCategories(posts) {
     var selectedCategory = $(".dropdown-menu")
+    selectedCategory.empty();
+    selectedCategory.append($(`<div class='dropdown-item' id=AllCmd'> <i class='fa fa-info-circle mx-2'></i> Toutes les catégories </div>`));
     var selectedCategories = [];
     if (posts != null) {
         posts.forEach(post => {
@@ -85,10 +92,11 @@ function convertToFrenchDate(numeric_date) {
     return weekday + " le " + date.toLocaleDateString("fr-FR", options) + " @ " + date.toLocaleTimeString("fr-FR");
 }
 //Render Function (GET)
-async function renderPosts(selectedCategory = null, keywords = null) {
-    //keywords
-    console.log(keywords);
-    showWaitingGif();
+async function renderPosts( queryString/*selectedCategory = null, keywords = null*/) {
+     showWaitingGif();
+     //keywords
+    /*console.log(keywords);
+   
     let posts;
     if (keywords != null) {
         console.log(keywords);
@@ -99,29 +107,18 @@ async function renderPosts(selectedCategory = null, keywords = null) {
     }
     else {
         console.log("nooooo");
-        posts = await API_GetPosts();
+        posts = await API_GetPosts(queryString);
     }
-
+*/
+    if(selectedCategorie!=""&&selectedCategorie!=null&&selectedCategorie!=undefined) queryString += `&Category=${selectedCategorie}`;
+    if(words!=""&&words!=undefined&&words!=null) queryString += `&keywords=${words}`;
+    posts = await API_GetPosts(queryString);
     if (posts !== null) {
-        if (!categoryAlreadyGet)
-            GetCategories(posts);
+        GetCategories(posts);
         currentETag = posts.etag;
         console.log(posts);
         eraseContent();
         //posts
-        if (selectedCategory != null) {
-            posts.forEach(post => {
-                if (selectedCategory == post.Category) {
-                    $(".content").append(renderPost(post));
-                }
-            });
-            $('.deleteCmd').on('click', function (e) {
-                console.log("click");
-                let id = $(this).attr("postId");
-                deletePostForm(id)
-            });
-        }
-        else {
             posts.forEach(post => {
                 $(".content").append(renderPost(post));
             });
@@ -130,7 +127,6 @@ async function renderPosts(selectedCategory = null, keywords = null) {
                 let id = $(this).attr("postId");
                 deletePostForm(id);
             });
-        }
     } else {
         renderError("Service introuvable");
     }

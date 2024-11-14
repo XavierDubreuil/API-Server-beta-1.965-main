@@ -5,10 +5,10 @@ let error = false;
 function API_getcurrentHttpError () {
     return currentHttpError; 
 }
-function API_GetPosts() {
+function API_GetPosts(queryString) {
     return new Promise(resolve => {
         $.ajax({
-            url: API_URL + "/?sort=Creation,desc",
+            url: API_URL + `${queryString}&sort=Creation,desc`,
             success: posts => { currentHttpError = ""; resolve(posts); },
             error: (xhr) => { console.log(xhr); resolve(null); }
         });

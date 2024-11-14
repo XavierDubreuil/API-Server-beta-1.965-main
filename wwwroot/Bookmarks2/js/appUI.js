@@ -23,8 +23,8 @@ Init_UI();
 
 async function Init_UI() {
     itemLayout = {
-        width: $("#sample").outerWidth(),
-        height: $("#sample").outerHeight()
+        width: $("#content").outerWidth(),
+        height: $("#content").outerHeight()
     };
     pageManager = new PageManager('scrollPanel', 'itemsPanel', itemLayout, renderBookmarks);
     compileCategories();

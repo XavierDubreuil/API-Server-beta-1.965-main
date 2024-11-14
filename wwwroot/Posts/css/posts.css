@@ -66,6 +66,7 @@ body{
 }
 /*Content related*/
 .content{
+    flex:1;
    margin: 1.5%;
    padding: 1.5%;
 }
