@@ -41,9 +41,13 @@ function GetCategories(posts) {
 
 //Start Funtion
 async function Init_UI() {
-    //pageManager = new PageManager('scrollPanel', 'itemsPanel', itemLayout, renderBookmarks);
+    itemLayout = {
+        width: $("#sample").outerWidth(),
+        height: $("#sample").outerHeight()
+    };
+    pageManager = new PageManager('scrollPanel', 'itemsPanel', itemLayout, renderPosts);
     $(".forms").hide();
-    await renderPosts();
+    //await renderPosts();
     start_Periodic_Refresh();
 }
 //Utilities Functions
@@ -202,7 +206,7 @@ function start_Periodic_Refresh() {
             let etag = await API_HeadPosts();
             if (currentETag != etag) {
                 currentETag = etag;
-                renderPosts();
+                await pageManager.update(false);
             }
         }
     },
