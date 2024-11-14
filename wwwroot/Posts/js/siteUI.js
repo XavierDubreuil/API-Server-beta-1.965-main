@@ -196,6 +196,30 @@ function renderDelete(toDeletePost) {
         </div>
     `);
 }
+//Create
+function renderCreatePostForm(){
+    $(".createForm").append(`
+        <span class="createTitle">Ajout d'un Article</span>
+            <form class="createForm">
+                <label for="Title">Titre de l'article</label>
+                <input type="text" id="Title" placeholder="Titre...">
+                <label for="Image">Image de l'article </label>
+                <div   class='imageUploader inputImage' 
+                       newImage='${create}' 
+                       controlId='Image' 
+                       imageSrc='default.jpg' 
+                       waitingImage="Loading_icon.gif">
+                </div>
+                <label for="Text">Texte de l'article</label>
+                <textarea id="Text" placeholder="Texte..."></textarea>
+                <label for="Category">Catégorie de l'article</label>
+                <input type="text" id="Category" placeholder="Catégorie...">
+
+                <input type="submit" value="Submit">
+            </form>
+        `);
+
+}
 function start_Periodic_Refresh() {
     setInterval(async () => {
         if (!hold_Periodic_Refresh) {
