@@ -22,6 +22,15 @@ $(".sendIcon").click(function () {
         pageManager.reset();
     }
 });
+$(".addIcon").click(function () {
+    renderCreatePostForm();
+});
+$("#back").click(function(){
+    $(".deleteForm").empty();
+    $(".createForm").empty();
+    $('.content').show();
+    $(".forms").hide();
+});
 //Les catégories
 function GetCategories(posts) {
     var selectedCategory = $(".dropdown-menu")
@@ -198,6 +207,11 @@ function renderDelete(toDeletePost) {
 }
 //Create
 function renderCreatePostForm(){
+    //Show forms
+    $(".forms").show();
+    //Hide the posts
+    $('.content').hide();
+    //Append Form
     $(".createForm").append(`
         <span class="createTitle">Ajout d'un Article</span>
             <form class="createForm">
@@ -218,7 +232,21 @@ function renderCreatePostForm(){
                 <input type="submit" value="Submit">
             </form>
         `);
-
+    //Listener On The Buttons
+    $('.createForm').on("submit", async function (event) {
+        event.preventDefault();
+        let Post = getFormData($(".createForm"));
+        console.log(Post)
+        //post = await Bookmarks_API.Save(Bookmark, create);
+        if (!API_SavePost.error) {
+            showBookmarks();
+            await pageManager.update(false);
+            //compileCategories();
+            pageManager.scrollToElem(Post.Id);
+        }
+        else
+            renderError("Une erreur est survenue!");
+    });
 }
 function start_Periodic_Refresh() {
     setInterval(async () => {
