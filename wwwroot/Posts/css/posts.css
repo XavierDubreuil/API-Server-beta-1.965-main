@@ -242,7 +242,6 @@ body{
     margin: auto;
     width: 100%;
     max-width: 1600px;
-    border: dotted red 1px;
 }
 .waitingGifcontainer {
     text-align: center;
