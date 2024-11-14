@@ -93,7 +93,6 @@ function convertToFrenchDate(numeric_date) {
 }
 //Render Function (GET)
 async function renderPosts( queryString/*selectedCategory = null, keywords = null*/) {
-     showWaitingGif();
      //keywords
     /*console.log(keywords);
    
@@ -120,7 +119,8 @@ async function renderPosts( queryString/*selectedCategory = null, keywords = nul
         eraseContent();
         //posts
             posts.forEach(post => {
-                $(".content").append(renderPost(post));
+                //console.log($("#itemsPanel"));
+                $("#itemsPanel").append(renderPost(post));
             });
             $('.deleteCmd').on('click', function (e) {
                 console.log("click");
@@ -133,7 +133,7 @@ async function renderPosts( queryString/*selectedCategory = null, keywords = nul
 }
 function renderPost(post) {
     return $(`	
-        <div class="newsContainer">
+        <div class="postRow">
             <hr />
             <div class="newsHeader">
                 <span class="newsCategory">${post.Category}</span>
