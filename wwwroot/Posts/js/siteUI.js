@@ -59,7 +59,7 @@ async function Init_UI() {
 }
 //Utilities Functions
 function eraseContent() {
-    $(".content").empty();
+    $("#itemsPanel").empty();
 }
 function showWaitingGif() {
     eraseContent();
@@ -116,7 +116,7 @@ async function renderPosts( queryString/*selectedCategory = null, keywords = nul
         GetCategories(posts);
         currentETag = posts.etag;
         console.log(posts);
-        eraseContent();
+        //eraseContent();
         //posts
             posts.forEach(post => {
                 //console.log($("#itemsPanel"));
