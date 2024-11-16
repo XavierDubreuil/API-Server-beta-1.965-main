@@ -28,6 +28,7 @@ $(".addIcon").click(function () {
 $("#back").click(function(){
     $(".deleteForm").empty();
     $(".createForm").empty();
+    $(".updateForm").empty();
     $('.content').show();
     $(".forms").hide();
 });
@@ -139,6 +140,13 @@ async function renderPosts( queryString/*selectedCategory = null, keywords = nul
                 //console.log($("#itemsPanel"));
                 $("#itemsPanel").append(renderPost(post));
             });
+            $(".postRow").hover(
+                function(){
+                    $(this).find(".actionIcon").show();
+                } , function(){
+                    $(this).find(".actionIcon").hide();
+                }
+            );
             $('.deleteCmd').on('click', function (e) {
                 console.log("click");
                 let id = $(this).attr("postId");
@@ -173,17 +181,16 @@ function renderPost(post) {
     id = post.Id
     return $(`	
         <div class="postRow">
-            <hr />
             <div class="newsHeader">
                 <span class="newsCategory">${post.Category}</span>
                 <div>
-                    <i class="fa-solid fa-pen-to-square actionIcon updateCmd" postId="${post.Id}"></i>
-                    <i class="fa-solid fa-trash actionIcon deleteCmd" postId="${post.Id}"></i>
+                    <i class="fa-solid fa-pen-to-square actionIcon updateCmd" postId="${post.Id}" style="display: none;"></i>
+                    <i class="fa-solid fa-trash actionIcon deleteCmd" postId="${post.Id}" style="display: none;"></i>
                 </div>
             </div>
             <p class="newsTitle">${post.Title}</p>
             <div class="newsImage" style='background-image: url("${post.Image}")'></div>
-            <span>${convertToFrenchDate(post.Creation)}</span>
+            <span class="newsCreation">${convertToFrenchDate(post.Creation)}</span>
             <p class="newsDescription" textPostId="${id}">${post.Text}</p>
             <span class="seeMoreBtn" showBtnPostId="${id}">Voir Plus</span>
             <span class="seeLessBtn" hideBtnPostId="${id}" style="display: none;">Voir Moins</span>
@@ -200,6 +207,7 @@ async function deletePostForm(id) {
     $('.content').hide();
     //Show the form
     $(".deleteForm").append(renderDelete(toDeletePost));
+    initFormValidation();
     //Listener On The Buttons
     $('.confirmButtonsContainer > div').on("click", async function () {
         console.log($(this).attr('id'));
@@ -231,7 +239,7 @@ function renderDelete(toDeletePost) {
             </div>
             <p class="deleteNewsTitle">${toDeletePost.Title}</p>
             <div class="deleteImage" style='background-image: url("${toDeletePost.Image}")'></div>
-            <span>${convertToFrenchDate(toDeletePost.Creation)}</span>
+            <span class="newsCreation">${convertToFrenchDate(toDeletePost.Creation)}</span>
             <p class="newsDescription">${toDeletePost.Text}</p>
         </div>
         <div class="confirmButtonsContainer">
@@ -254,7 +262,7 @@ function renderCreatePostForm(){
             <form class="createFormContainer">
                 <input type="hidden" name="Id" value=""/>
                 <label for="Title">Titre de l'article</label>
-                <input type="text" id="Title" placeholder="Titre..." name="Title">
+                <input type="text" id="Title" placeholder="Titre..." name="Title" required RequireMessage="Veuillez entrer le titre">
                 <label>Image de l'article </label>
                     <div  class='imageUploader inputImage' 
                            newImage='${create}' 
@@ -262,34 +270,43 @@ function renderCreatePostForm(){
                            imageSrc='default.jpg' 
                            waitingImage="Loading_icon.gif">
                     </div>
+                <span id="missingImageError">Veuillez entrer une image</span>
                 <label for="Text">Texte de l'article</label>
-                <textarea id="Text" placeholder="Texte..." value="" name="Text"></textarea>
+                <textarea id="Text" placeholder="Texte..." value="" name="Text" required RequireMessage="Veuillez entrer le texte"></textarea>
                 <label for="Category">Catégorie de l'article</label>
-                <input type="text" id="Category" placeholder="Catégorie..." value="" name="Category">
+                <input type="text" id="Category" placeholder="Catégorie..." value="" name="Category" required RequireMessage="Veuillez entrer la catégorie">
 
                 <input type="submit" value="Submit">
             </form>
         `);
-    initImageUploaders()
+    $('#missingImageError').hide();
+    initImageUploaders();
+    initFormValidation();
     //Listener On The Buttons
     $('.createForm').on("submit", async function (event) {
         event.preventDefault();
         let post = getFormData($(".createFormContainer"));
-        post.Creation = Date.now();
-        console.log(post)
-        post = await API_SavePost(post, true);
-        if (!API_SavePost.error) {
-            //showBookmarks();
-            $(".createForm").empty();
-            $('.content').show();
-            $('.forms').hide();
-            renderPosts();
-            await pageManager.update(false);
-            //compileCategories();
-            pageManager.scrollToElem(post.Id);
+        if(post.Image != ""){
+            $('#missingImageError').hide();
+            post.Creation = Date.now();
+            console.log(post)
+            post = await API_SavePost(post, true);
+            if (!API_SavePost.error) {
+                //showBookmarks();
+                $(".createForm").empty();
+                $('.content').show();
+                $('.forms').hide();
+                renderPosts();
+                await pageManager.update(false);
+                //compileCategories();
+                pageManager.scrollToElem(post.Id);
+            }
+            else
+                renderError("Une erreur est survenue!");
+        } 
+        else {
+            $('#missingImageError').show();
         }
-        else
-            renderError("Une erreur est survenue!");
     });
 }
 //Update
@@ -305,9 +322,9 @@ async function renderUpdatePostForm(id){
     $(".updateForm").append(`
         <span class="createTitle">Modification d'un Article</span>
             <form class="createFormContainer">
-                <input type="hidden" name="Id" value="${postToUpdate.Id}"/>
+                <input type="hidden" name="Id" value="${postToUpdate.Id}" />
                 <label for="Title">Titre de l'article</label>
-                <input type="text" id="Title" placeholder="Titre..." name="Title" value="${postToUpdate.Title}">
+                <input type="text" id="Title" placeholder="Titre..." name="Title" value="${postToUpdate.Title}" required RequireMessage="Veuillez entrer le titre">
                 <label>Image de l'article </label>
                     <div  class='imageUploader inputImage' 
                            newImage='${false}' 
@@ -316,14 +333,15 @@ async function renderUpdatePostForm(id){
                            waitingImage="Loading_icon.gif">
                     </div>
                 <label for="Text">Texte de l'article</label>
-                <textarea id="Text" placeholder="Texte..." name="Text">${postToUpdate.Text}</textarea>
+                <textarea id="Text" placeholder="Texte..." name="Text" required RequireMessage="Veuillez entrer le texte">${postToUpdate.Text}</textarea>
                 <label for="Category">Catégorie de l'article</label>
-                <input type="text" id="Category" placeholder="Catégorie..." value="${postToUpdate.Category}" name="Category">
+                <input type="text" id="Category" placeholder="Catégorie..." value="${postToUpdate.Category}" name="Category" required RequireMessage="Veuillez entrer la catégorie">
 
                 <input type="submit" value="Submit">
             </form>
         `);
-    initImageUploaders()
+    initImageUploaders();
+    initFormValidation();
     //Listener On The Buttons
     $('.updateForm').on("submit", async function (event) {
         event.preventDefault();
