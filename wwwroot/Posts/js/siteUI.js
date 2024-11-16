@@ -100,6 +100,14 @@ function convertToFrenchDate(numeric_date) {
     }
     return weekday + " le " + date.toLocaleDateString("fr-FR", options) + " @ " + date.toLocaleTimeString("fr-FR");
 }
+function getFormData($form) {
+    const removeTag = new RegExp("(<[a-zA-Z0-9]+>)|(</[a-zA-Z0-9]+>)", "g");
+    var jsonObject = {};
+    $.each($form.serializeArray(), (index, control) => {
+        jsonObject[control.name] = control.value.replace(removeTag, "");
+    });
+    return jsonObject;
+}
 //Render Function (GET)
 async function renderPosts( queryString/*selectedCategory = null, keywords = null*/) {
      //keywords
@@ -124,7 +132,7 @@ async function renderPosts( queryString/*selectedCategory = null, keywords = nul
     if (posts !== null) {
         GetCategories(posts);
         currentETag = posts.etag;
-        console.log(posts);
+        //console.log(posts);
         //eraseContent();
         //posts
             posts.forEach(post => {
@@ -136,25 +144,49 @@ async function renderPosts( queryString/*selectedCategory = null, keywords = nul
                 let id = $(this).attr("postId");
                 deletePostForm(id);
             });
+            $('.updateCmd').on('click', function (e) {
+                console.log("click");
+                let id = $(this).attr("postId");
+                renderUpdatePostForm(id);
+            });
+            $('.seeMoreBtn').on('click', function (e) {
+                console.log("click");
+                let id = $(this).attr("showBtnPostId");
+                let text =  $($(`[textPostId=${id}]`));
+                $(text).css("height","auto");
+                $(this).hide();
+                $($(`[hideBtnPostId=${id}]`)).show();
+            });
+            $('.seeLessBtn').on('click', function (e) {
+                console.log("click");
+                let id = $(this).attr("hideBtnPostId");
+                let text =  $($(`[textPostId=${id}]`));
+                $(text).css("height","120px");
+                $(this).hide();
+                $($(`[showBtnPostId=${id}]`)).show();
+            });
     } else {
         renderError("Service introuvable");
     }
 }
 function renderPost(post) {
+    id = post.Id
     return $(`	
         <div class="postRow">
             <hr />
             <div class="newsHeader">
                 <span class="newsCategory">${post.Category}</span>
                 <div>
-                    <i class="fa-solid fa-pen-to-square actionIcon"></i>
+                    <i class="fa-solid fa-pen-to-square actionIcon updateCmd" postId="${post.Id}"></i>
                     <i class="fa-solid fa-trash actionIcon deleteCmd" postId="${post.Id}"></i>
                 </div>
             </div>
             <p class="newsTitle">${post.Title}</p>
             <div class="newsImage" style='background-image: url("${post.Image}")'></div>
             <span>${convertToFrenchDate(post.Creation)}</span>
-            <p class="newsDescription">${post.Text}</p>
+            <p class="newsDescription" textPostId="${id}">${post.Text}</p>
+            <span class="seeMoreBtn" showBtnPostId="${id}">Voir Plus</span>
+            <span class="seeLessBtn" hideBtnPostId="${id}" style="display: none;">Voir Moins</span>
         </div>
     `);
 }
@@ -177,12 +209,15 @@ async function deletePostForm(id) {
                 console.log("erreur");
             $(".deleteForm").empty();
             $('.content').show();
+            $('.forms').hide();
+
             renderPosts();
         }
         else {
             $(".deleteForm").empty();
             $('.content').show();
-            $(".forms").hide();
+            $('.forms').hide();
+            renderPosts();
         }
     });
 
@@ -212,37 +247,99 @@ function renderCreatePostForm(){
     //Hide the posts
     $('.content').hide();
     //Append Form
+    create = false;
+    console.log("append");
     $(".createForm").append(`
         <span class="createTitle">Ajout d'un Article</span>
-            <form class="createForm">
+            <form class="createFormContainer">
+                <input type="hidden" name="Id" value=""/>
                 <label for="Title">Titre de l'article</label>
-                <input type="text" id="Title" placeholder="Titre...">
-                <label for="Image">Image de l'article </label>
-                <div   class='imageUploader inputImage' 
-                       newImage='${create}' 
-                       controlId='Image' 
-                       imageSrc='default.jpg' 
-                       waitingImage="Loading_icon.gif">
-                </div>
+                <input type="text" id="Title" placeholder="Titre..." name="Title">
+                <label>Image de l'article </label>
+                    <div  class='imageUploader inputImage' 
+                           newImage='${create}' 
+                           controlId='Image' 
+                           imageSrc='default.jpg' 
+                           waitingImage="Loading_icon.gif">
+                    </div>
                 <label for="Text">Texte de l'article</label>
-                <textarea id="Text" placeholder="Texte..."></textarea>
+                <textarea id="Text" placeholder="Texte..." value="" name="Text"></textarea>
                 <label for="Category">Catégorie de l'article</label>
-                <input type="text" id="Category" placeholder="Catégorie...">
+                <input type="text" id="Category" placeholder="Catégorie..." value="" name="Category">
 
                 <input type="submit" value="Submit">
             </form>
         `);
+    initImageUploaders()
     //Listener On The Buttons
     $('.createForm').on("submit", async function (event) {
         event.preventDefault();
-        let Post = getFormData($(".createForm"));
-        console.log(Post)
-        //post = await Bookmarks_API.Save(Bookmark, create);
+        let post = getFormData($(".createFormContainer"));
+        post.Creation = Date.now();
+        console.log(post)
+        post = await API_SavePost(post, true);
         if (!API_SavePost.error) {
-            showBookmarks();
+            //showBookmarks();
+            $(".createForm").empty();
+            $('.content').show();
+            $('.forms').hide();
+            renderPosts();
             await pageManager.update(false);
             //compileCategories();
-            pageManager.scrollToElem(Post.Id);
+            pageManager.scrollToElem(post.Id);
+        }
+        else
+            renderError("Une erreur est survenue!");
+    });
+}
+//Update
+async function renderUpdatePostForm(id){
+    //Get The post
+    let postToUpdate = await API_GetPost(id);
+    //Show forms
+    $(".forms").show();
+    //Hide the posts
+    $('.content').hide();
+    //Append Form
+    create = false;
+    $(".updateForm").append(`
+        <span class="createTitle">Modification d'un Article</span>
+            <form class="createFormContainer">
+                <input type="hidden" name="Id" value="${postToUpdate.Id}"/>
+                <label for="Title">Titre de l'article</label>
+                <input type="text" id="Title" placeholder="Titre..." name="Title" value="${postToUpdate.Title}">
+                <label>Image de l'article </label>
+                    <div  class='imageUploader inputImage' 
+                           newImage='${false}' 
+                           controlId='Image' 
+                           imageSrc='${postToUpdate.Image}' 
+                           waitingImage="Loading_icon.gif">
+                    </div>
+                <label for="Text">Texte de l'article</label>
+                <textarea id="Text" placeholder="Texte..." name="Text">${postToUpdate.Text}</textarea>
+                <label for="Category">Catégorie de l'article</label>
+                <input type="text" id="Category" placeholder="Catégorie..." value="${postToUpdate.Category}" name="Category">
+
+                <input type="submit" value="Submit">
+            </form>
+        `);
+    initImageUploaders()
+    //Listener On The Buttons
+    $('.updateForm').on("submit", async function (event) {
+        event.preventDefault();
+        let post = getFormData($(".createFormContainer"));
+        post.Creation = Date.now();
+        console.log(post)
+        post = await API_SavePost(post, false);
+        if (!API_SavePost.error) {
+            //showBookmarks();
+            $(".updateForm").empty();
+            $('.content').show();
+            $('.forms').hide();
+            renderPosts();
+            await pageManager.update(false);
+            //compileCategories();
+            pageManager.scrollToElem(post.Id);
         }
         else
             renderError("Une erreur est survenue!");
