@@ -5,10 +5,17 @@ let error = false;
 function API_getcurrentHttpError () {
     return currentHttpError; 
 }
-function API_GetPosts(queryString) {
+function API_GetPosts(queryString = null) {
+    let urlUsed;
+    if(queryString == null){
+        urlUsed = API_URL;
+    }
+    else{
+        urlUsed = API_URL + `${queryString}&sort=Creation,desc`;
+    }
     return new Promise(resolve => {
         $.ajax({
-            url: API_URL + `${queryString}&sort=Creation,desc`,
+            url: urlUsed,
             success: posts => { currentHttpError = ""; resolve(posts); },
             error: (xhr) => { console.log(xhr); resolve(null); }
         });

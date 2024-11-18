@@ -3,7 +3,7 @@ let categoryAlreadyGet = false;
 let hold_Periodic_Refresh = false;
 let pageManager;
 let selectedCategorie = "";
-let currentETag = "";
+let etagCurrent = "";
 let words = "";
 $(".dropdown-menu").on("click", ".dropdown-item", function () {
     //console.log($(this).data("name"));
@@ -23,20 +23,20 @@ $(".sendIcon").click(function () {
     }
 });
 $(".addIcon").click(function () {
+    eraseForms();
     renderCreatePostForm();
 });
-$("#back").click(function(){
-    $(".deleteForm").empty();
-    $(".createForm").empty();
-    $(".updateForm").empty();
+$("#back").click(async function(){
+    eraseForms();
     $('.content').show();
     $(".forms").hide();
+    await pageManager.update(false);
 });
 //Les catégories
 function GetCategories(posts) {
     var selectedCategory = $(".dropdown-menu")
     selectedCategory.empty();
-    selectedCategory.append($(`<div class='dropdown-item' id=AllCmd'> <i class='fa fa-info-circle mx-2'></i> Toutes les catégories </div>`));
+    selectedCategory.append($(`<div class='dropdown-item' id='AllCmd'> <i class='fa fa-info-circle mx-2'></i> Toutes les catégories </div>`));
     var selectedCategories = [];
     if (posts != null) {
         posts.forEach(post => {
@@ -68,6 +68,12 @@ async function Init_UI() {
     start_Periodic_Refresh();
 }
 //Utilities Functions
+function eraseForms() {
+    $(".deleteForm").empty();
+    $(".createForm").empty();
+    $(".updateForm").empty();
+    $("#itemsPanel").empty();
+}
 function eraseContent() {
     $("#itemsPanel").empty();
 }
@@ -130,8 +136,9 @@ async function renderPosts( queryString/*selectedCategory = null, keywords = nul
     if(selectedCategorie!=""&&selectedCategorie!=null&&selectedCategorie!=undefined) queryString += `&Category=${selectedCategorie}`;
     if(words!=""&&words!=undefined&&words!=null) queryString += `&keywords=${words}`;
     posts = await API_GetPosts(queryString);
+    let allPosts = await API_GetPosts();
     if (posts !== null) {
-        GetCategories(posts);
+        GetCategories(allPosts);
         currentETag = posts.etag;
         //console.log(posts);
         //eraseContent();
@@ -150,11 +157,13 @@ async function renderPosts( queryString/*selectedCategory = null, keywords = nul
             $('.deleteCmd').on('click', function (e) {
                 console.log("click");
                 let id = $(this).attr("postId");
+                eraseForms();
                 deletePostForm(id);
             });
             $('.updateCmd').on('click', function (e) {
                 console.log("click");
                 let id = $(this).attr("postId");
+                eraseForms();
                 renderUpdatePostForm(id);
             });
             $('.seeMoreBtn').on('click', function (e) {
@@ -218,14 +227,13 @@ async function deletePostForm(id) {
             $(".deleteForm").empty();
             $('.content').show();
             $('.forms').hide();
-
-            renderPosts();
+            await pageManager.update(false);
         }
         else {
             $(".deleteForm").empty();
             $('.content').show();
             $('.forms').hide();
-            renderPosts();
+            await pageManager.update(false);
         }
     });
 
@@ -240,7 +248,7 @@ function renderDelete(toDeletePost) {
             <p class="deleteNewsTitle">${toDeletePost.Title}</p>
             <div class="deleteImage" style='background-image: url("${toDeletePost.Image}")'></div>
             <span class="newsCreation">${convertToFrenchDate(toDeletePost.Creation)}</span>
-            <p class="newsDescription">${toDeletePost.Text}</p>
+            <p class="deleteNewsDescription">${toDeletePost.Text}</p>
         </div>
         <div class="confirmButtonsContainer">
             <div class="confirmButton" id="noOption">Non</div>
@@ -296,7 +304,6 @@ function renderCreatePostForm(){
                 $(".createForm").empty();
                 $('.content').show();
                 $('.forms').hide();
-                renderPosts();
                 await pageManager.update(false);
                 //compileCategories();
                 pageManager.scrollToElem(post.Id);
@@ -354,7 +361,7 @@ async function renderUpdatePostForm(id){
             $(".updateForm").empty();
             $('.content').show();
             $('.forms').hide();
-            renderPosts();
+
             await pageManager.update(false);
             //compileCategories();
             pageManager.scrollToElem(post.Id);
@@ -367,8 +374,8 @@ function start_Periodic_Refresh() {
     setInterval(async () => {
         if (!hold_Periodic_Refresh) {
             let etag = await API_HeadPosts();
-            if (currentETag != etag) {
-                currentETag = etag;
+            if (etagCurrent != etag) {
+                etagCurrent = etag;
                 await pageManager.update(false);
             }
         }

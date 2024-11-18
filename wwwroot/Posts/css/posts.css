@@ -153,7 +153,7 @@ body{
     width: 67%;
     aspect-ratio: 16/9;
 }
-.newsDescription{
+.newsDescription, .deleteNewsDescription{
     margin-top: 10px;
     font-family: var(--notoFont);
     font-weight: 600;
@@ -181,7 +181,7 @@ body{
         font-size: 1em;
         text-decoration: underline solid var(--greenText) 50%;
     }
-    .newsDescription{
+    .newsDescription, .deleteNewsDescription{
         margin-top: 5px;
         font-weight: 400;
         text-align: justify;
@@ -211,7 +211,11 @@ body{
 }
 /*Delete Form Related*/
 .deleteImage{
-    height: 450px;
+    width: 100%;
+    aspect-ratio: 16/9;
+}
+.deleteNewsDescription{
+    height: auto;
 }
 .deleteNewsContainer{
     width: 50%;
@@ -225,7 +229,7 @@ body{
 }
 .deleteNewsTitle{
     font-size: 1.7em;
-    overflow: auto;
+    height: auto;
 }
 .confirmButtonsContainer{
     display: flex;
@@ -274,6 +278,9 @@ body{
     }
     .formTitle{
         font-size: 1.6em;
+    }
+    .deleteNewsDescription{
+        height: auto;
     }
 }
 /*Create Form Related*/
